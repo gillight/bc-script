@@ -1,8 +1,90 @@
-define int ( input ) {
-  auto orig_scale,output
-  orig_scale=scale
-  scale=0
-  output=input/1
-  scale=orig_scale
-  return (output)
+#!/usr/bin/bc -l
+define min(a, b) {
+    if (a < b) { return a; }
+    return b;
+}
+
+define max(a, b) {
+    if (a < b) { return b; }
+    return a;
+}
+
+define abs(a) {
+    if (a > 0) {
+        return  a;
+     } else {
+        return -a;
+     }
+}
+
+define int(a) {
+    auto prev_scale, ret;
+    
+    prev_scale = scale;
+    {
+		scale =0; 
+		ret = a / 1;
+    }
+    scale = prev_scale;
+    return ret
+}
+
+define round(a) {
+	return round_by(a, 1);
+}
+
+define round_by(a, unit) {
+	return floor_by(a + (a / abs(a) * unit / 2), unit);
+}
+
+define floor(a) {
+	return floor_by(a, 1) ;
+}
+
+define floor_by(a, unit) {
+	if (int(a / unit) <= (a / unit)) {
+		return int(a / unit) * unit;
+	} else {
+		return int(a / unit) * unit - unit;
+	}	
+}
+
+define ceil(a) {
+	return ceil_by(a, 1);
+}
+
+define ceil_by(a, unit) {
+	return -floor_by(-a, unit);
+}
+
+
+#need to clean
+define over_buy(price, to){
+  auto per;
+  per = 3.5
+  return round_to(price * (1 + (per / 100)), to)
+}
+
+define item_to_buy(price, budget){
+  auto per;
+  per = 3.5
+  return round(budget / (price * (1 + (per / 2 / 100))))
+}
+
+define hum_per(quotient) {
+  return round_to((quotient - 1) * 100, 0.01)
+}
+
+define hum(v) { 
+  auto prev_scale, ret;
+  for (i = 0; i <= scale(v); i++) { 
+    if (floor(v * (10^i)) == (v * (10^i))) { 
+      prev_scale = scale; 
+      scale = i; 
+      ret = v/1;
+      scale = prev_scale;
+      return ret;
+    }
+  }
+  return v;
 }
