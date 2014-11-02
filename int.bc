@@ -99,6 +99,45 @@ define exp(base, exp) {
 	return round(ret * mltp) / mltp;
 }
 
+define pi() {
+	return a(1) * 4;
+}
+
+div_qr_ret[0] = 0;
+div_qr_ret[1] = 0;
+define div_qr(dividend, divisor) {
+	auto prev_scale, quotient, remainder;
+	
+	prev_scale = scale;
+	{
+		scale = 0;
+		remainder = dividend % divisor;
+		quotient = (dividend - remainder) / divisor;
+		div_qr_ret[0] = quotient
+		div_qr_ret[1] = remainder;
+	}
+	scale = prev_scale;
+	return;
+}
+
+define div_q(dividend, divisor) {
+	auto unused;
+	
+	unused = div_qr(dividend, divisor)
+	return div_qr_ret[0];
+}
+
+define div_r(dividend, divisor) {
+	auto unused;
+	
+	unused = div_qr(dividend, divisor)
+	return div_qr_ret[1];
+}
+
+define div(dividend, divisor) {
+	return div_q(dividend, divisor);
+}
+
 #need to clean
 define over_buy(price, to){
   auto per;
