@@ -57,6 +57,36 @@ define ceil_by(a, unit) {
 	return -floor_by(-a, unit);
 }
 
+define log2(a) {
+	if (a < 0) { return 0; }
+	return l(a) / l(2);
+}
+
+define log2int(a) {
+	return int(log2(a));
+}
+
+define is_two_exp(a) {
+	return 2^(log2int(a)) == a;
+}
+
+define sqrt_loop(base, exp){
+	auto i, step, ret;
+	
+	ret = base;
+	step = log2int(1 / exp);
+	for (i = 0; i < step; i++) {
+		ret = sqrt(ret);
+	}
+	return ret;
+}
+
+define exp(base, exp) {
+	if (int(exp) == exp) { return base^exp; }
+	if (exp == 0.5) { return sqrt(base); }
+	if (is_two_exp(1 / exp) ) { return sqrt_loop(base, exp)}
+	return e(l(base) * exp);
+}
 
 #need to clean
 define over_buy(price, to){
