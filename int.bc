@@ -81,11 +81,22 @@ define sqrt_loop(base, exp){
 	return ret;
 }
 
+define decimal(a) {
+	return  ceil(l(abs(a)) / l(10));
+}
+
+define precision(a) {
+	return length(a) - decimal(a);
+}
+
 define exp(base, exp) {
+	auto ret, mltp;
 	if (int(exp) == exp) { return base^exp; }
 	if (exp == 0.5) { return sqrt(base); }
 	if (is_two_exp(1 / exp) ) { return sqrt_loop(base, exp)}
-	return e(l(base) * exp);
+	ret = e(l(base) * exp);
+	mltp = 10^(precision(ret) - 2);
+	return round(ret * mltp) / mltp;
 }
 
 #need to clean
