@@ -1,144 +1,91 @@
 #!/usr/bin/bc -l
-define min(a, b) {
-    if (a < b) { return a; }
-    return b;
+
+# bc integer functions I've found useful
+# while systems programming in the unix environment.
+
+# License: LGPLv2
+# Author:
+#    http://www.pixelbeat.org/
+# Notes:
+#    I only use bc when python is not available.
+#    Personally I have this file in ~/bin/bc so
+#    that I can just invoke bc as normal and have these
+#    extra functions available.
+# Changes:
+#    V0.1, 11 Apr 2007, Initial release
+
+
+define min(x,y) {
+    if (x<y) return x
+    return y
 }
 
-define max(a, b) {
-    if (a < b) { return b; }
-    return a;
+define max(x,y) {
+    if (x>y) return x
+    return y
 }
 
-define abs(a) {
-    if (a > 0) {
-        return  a;
-     } else {
-        return -a;
-     }
+define abs(x) {
+    if (x<0) return -x
+    return x
 }
 
-define int(a) {
-    auto prev_scale, ret;
-    
-    prev_scale = scale;
-    {
-		scale =0; 
-		ret = a / 1;
-    }
-    scale = prev_scale;
+/* take integer part */
+define int(x) {
+    auto old_scale   /* variables global by default */
+    old_scale=scale  /* scale is global */
+    scale=0; ret=x/1
+    scale=old_scale
     return ret
 }
 
-define round(a) {
-	return round_by(a, 1);
+/* round to nearest integer */
+define round(x) {
+    if (x<0) x-=.5 else x+=.5
+    return int(x)
 }
 
-define round_by(a, unit) {
-	return floor_by(a + (a / abs(a) * unit / 2), unit);
+/* smallest integer >= arg */
+define ceil(x) {
+    auto intx
+    intx=int(x)
+    if (intx<x) intx+=1
+    return intx
 }
 
-define floor(a) {
-	return floor_by(a, 1) ;
+/* largest integer <= arg */
+define floor(x) {
+    return -ceil(-x)
 }
 
-define floor_by(a, unit) {
-	if (int(a / unit) <= (a / unit)) {
-		return int(a / unit) * unit;
-	} else {
-		return int(a / unit) * unit - unit;
-	}	
+/* round x to previous multiple of y */
+define round_down(x,y) {
+    return y*floor(x/y)
 }
 
-define ceil(a) {
-	return ceil_by(a, 1);
+/* round x to next multiple of y */
+define round_up(x,y) {
+    return y*ceil(x/y)
 }
 
-define ceil_by(a, unit) {
-	return -floor_by(-a, unit);
+/* round x to nearest multiple of y */
+define round_to(x,y) {
+    return y*round(x/y)
 }
 
-define log2(a) {
-	if (a < 0) { return 0; }
-	return l(a) / l(2);
+/* Greatest Common Divisor or Highest Common Factor of x and y */
+/* Note when people say Lowest Common Denominator they usually mean this */
+define gcd(x,y) {
+     if (y==0) return x
+     return gcd(y,x%y) /* anything that divides into x and y also divides into the remainder of x/y */
 }
 
-define log2int(a) {
-	return int(log2(a));
+/* Lowest Common Multiple of x and y */
+/* Lowest Common Denominator of fractions is LCM of the denominators */
+define lcm(x,y) {
+    return (x*y/gcd(x,y))
 }
 
-define is_two_exp(a) {
-	return 2^(log2int(a)) == a;
-}
-
-define sqrt_loop(base, exp){
-	auto i, step, ret;
-	
-	ret = base;
-	step = log2int(1 / exp);
-	for (i = 0; i < step; i++) {
-		ret = sqrt(ret);
-	}
-	return ret;
-}
-
-define decimal(a) {
-	return  ceil(l(abs(a)) / l(10));
-}
-
-define precision(a) {
-	return length(a) - decimal(a);
-}
-
-define exp(base, exp) {
-	auto ret, mltp;
-	if (int(exp) == exp) { return base^exp; }
-	if (exp == 0.5) { return sqrt(base); }
-	if (is_two_exp(1 / exp) ) { return sqrt_loop(base, exp)}
-	ret = e(l(base) * exp);
-	mltp = 10^(precision(ret) - 2);
-	return round(ret * mltp) / mltp;
-}
-
-define pi() {
-	return a(1) * 4;
-}
-
-div_qr_ret[0] = 0;
-div_qr_ret[1] = 0;
-define div_qr(dividend, divisor) {
-	auto prev_scale, quotient, remainder;
-	
-	prev_scale = scale;
-	{
-		scale = 0;
-		remainder = dividend % divisor;
-		quotient = (dividend - remainder) / divisor;
-		div_qr_ret[0] = quotient
-		div_qr_ret[1] = remainder;
-	}
-	scale = prev_scale;
-	return;
-}
-
-define div_q(dividend, divisor) {
-	auto unused;
-	
-	unused = div_qr(dividend, divisor)
-	return div_qr_ret[0];
-}
-
-define div_r(dividend, divisor) {
-	auto unused;
-	
-	unused = div_qr(dividend, divisor)
-	return div_qr_ret[1];
-}
-
-define div(dividend, divisor) {
-	return div_q(dividend, divisor);
-}
-
-#need to clean
 define over_buy(price, to){
   auto per;
   per = 3.5
@@ -168,3 +115,5 @@ define hum(v) {
   }
   return v;
 }
+
+#scale=0
